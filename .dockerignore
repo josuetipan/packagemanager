@@ -1,0 +1,17 @@
+# Ignorar dependencias de desarrollo
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Ignorar archivos de configuración locales
+.DS_Store
+.env
+.env.*.local
+
+# Ignorar carpetas innecesarias
+.vscode
+.git
+coverage
+tests
+dist

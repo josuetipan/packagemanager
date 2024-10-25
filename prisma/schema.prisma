@@ -1,0 +1,355 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model answer_types {
+  id_answer_type   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type_of_response String           @db.VarChar(50)
+  quiz_questions   quiz_questions[]
+}
+
+model awards {
+  id_award         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_status        String?  @db.Uuid
+  date_limit_award DateTime @db.Date
+  award_name       String   @db.VarChar(255)
+  position_ranking String   @db.VarChar(50)
+  description      String?
+}
+
+model commissions {
+  id_commission     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_status         String?  @db.Uuid
+  start_date        DateTime @db.Date
+  end_date          DateTime @db.Date
+  amount_pay        Decimal  @db.Decimal(10, 2)
+  url_image_voucher String   @db.VarChar(100)
+  range             String?  @db.VarChar(255)
+}
+
+model countries {
+  id_country   String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  country_code String      @db.VarChar(10)
+  name         String      @db.VarChar(100)
+  policies     policies[]
+  provinces    provinces[]
+}
+
+model provinces {
+  id_province String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String     @db.VarChar(100)
+  id_country  String?    @db.Uuid
+  cities      cities[]
+  countries   countries? @relation(fields: [id_country], references: [id_country], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model quiz_questions {
+  id_question          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description_question String
+  id_answer_type       String?            @db.Uuid
+  question_answers     question_answers[]
+  answer_types         answer_types?      @relation(fields: [id_answer_type], references: [id_answer_type], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model quiz_results {
+  id_result  String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  attempts   Int
+  score      Int
+  id_user    String?     @unique @db.Uuid
+  id_status  String?     @db.Uuid
+  user_roles user_roles? @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model roles {
+  id_role    String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String       @db.VarChar(50)
+  code_role  Int          @default(autoincrement())
+  trainings  trainings[]
+  user_roles user_roles[]
+}
+
+model sales {
+  id_sale                        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_status                      String?          @db.Uuid
+  sale_date                      DateTime         @db.Date
+  sale_price                     Decimal          @db.Decimal(10, 2)
+  commission_generated           String?          @db.Uuid
+  id_package                     String?          @db.Uuid
+  id_customer                    String?          @db.Uuid
+  id_seller                      String?          @db.Uuid
+  url_image_voucher_sale         String           @db.VarChar(100)
+  id_payment_method              String?          @db.Uuid
+  users_sales_id_customerTousers users?           @relation("sales_id_customerTousers", fields: [id_customer], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+  payment_method                 payment_methods? @relation(fields: [id_payment_method], references: [id_payment_method], onDelete: NoAction, onUpdate: NoAction)
+  users_sales_id_sellerTousers   users?           @relation("sales_id_sellerTousers", fields: [id_seller], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model status {
+  id_status   String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String      @db.VarChar(100)
+  status_type String      @db.VarChar(50)
+  description String?
+  code_status String?     @db.VarChar(50)
+  discounts   discounts[]
+  packages    packages[]
+}
+
+model training_progress {
+  id_progress         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_user             String?    @db.Uuid
+  id_training         String?    @db.Uuid
+  id_status           String?    @db.Uuid
+  progress_percentage Int
+  started_at          DateTime?  @default(now()) @db.Timestamp(6)
+  completed_at        DateTime?  @db.Timestamp(6)
+  last_access         DateTime?  @default(now()) @db.Timestamp(6)
+  created_at          DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?  @default(now()) @db.Timestamp(6)
+  training            trainings? @relation(fields: [id_training], references: [id_training], onDelete: NoAction, onUpdate: NoAction)
+  users               users?     @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_roles {
+  id_user_role     String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_role          String?       @db.Uuid
+  id_user          String?       @unique @db.Uuid
+  id_status        String?       @db.Uuid
+  last_modified_by String?       @db.Uuid
+  created_at       DateTime?     @default(now()) @db.Timestamp(6)
+  last_modified_at DateTime?     @default(now()) @db.Timestamp(6)
+  last_access      DateTime?     @default(now()) @db.Timestamp(6)
+  quiz_results     quiz_results?
+  roles            roles?        @relation(fields: [id_role], references: [id_role], onDelete: NoAction, onUpdate: NoAction)
+  users            users?        @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id_user                        String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_identification_type         String?                   @db.Uuid
+  identification_number          String                    @db.VarChar(15)
+  name                           String                    @db.VarChar(50)
+  last_name                      String                    @db.VarChar(50)
+  phone                          String?                   @db.VarChar(20)
+  email                          String                    @unique @db.VarChar(100)
+  password                       String                    @db.VarChar(255)
+  id_city                        String?                   @db.Uuid
+  created_at                     DateTime?                 @default(now()) @db.Timestamp(6)
+  updated_at                     DateTime?                 @default(now()) @db.Timestamp(6)
+  bank_accounts                  bank_accounts[]
+  games                          games[]
+  platform_codes                 platform_codes[]
+  policy_acceptances             policy_acceptances[]
+  sales_sales_id_customerTousers sales[]                   @relation("sales_id_customerTousers")
+  sales_sales_id_sellerTousers   sales[]                   @relation("sales_id_sellerTousers")
+  training_progress              training_progress[]
+  user_roles                     user_roles?
+  city                           cities?                   @relation(fields: [id_city], references: [id_city], onDelete: NoAction, onUpdate: NoAction)
+  identification_types           identification_types?     @relation(fields: [id_identification_type], references: [id_identification_type], onDelete: NoAction, onUpdate: NoAction)
+  video_training_progress        video_training_progress[]
+}
+
+model video_training_progress {
+  id_progress            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_user                String?    @db.Uuid
+  id_training            String?    @db.Uuid
+  current_video_position DateTime   @db.Time(6)
+  total_video_duration   DateTime   @db.Time(6)
+  last_access            DateTime?  @default(now()) @db.Timestamp(6)
+  created_at             DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at             DateTime?  @default(now()) @db.Timestamp(6)
+  iscompleted            Boolean?   @default(false)
+  training               trainings? @relation(fields: [id_training], references: [id_training], onDelete: NoAction, onUpdate: NoAction)
+  users                  users?     @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model bank_accounts {
+  id_bank_account String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_type_account String?        @db.Uuid
+  name_account    String         @db.VarChar(100)
+  name_bank       String         @db.VarChar(100)
+  number_account  String         @db.VarChar(50)
+  id_user         String?        @db.Uuid
+  type_accounts   type_accounts? @relation(fields: [id_type_account], references: [id_type_account], onDelete: NoAction, onUpdate: NoAction)
+  users           users?         @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model cities {
+  id_city     String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String     @db.VarChar(100)
+  id_province String?    @db.Uuid
+  provinces   provinces? @relation(fields: [id_province], references: [id_province], onDelete: NoAction, onUpdate: NoAction)
+  users       users[]
+}
+
+model identification_types {
+  id_identification_type String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                   String  @db.VarChar(50)
+  code_identification    String? @db.Char(1)
+  users                  users[]
+}
+
+model packages {
+  id_package       String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_level         String?    @db.Uuid
+  id_discount      String?    @db.Uuid
+  name             String     @db.VarChar(100)
+  price            Decimal    @db.Decimal(10, 2)
+  expiration_date  DateTime?  @db.Date
+  characteristics  String?
+  description      String?
+  content          String?
+  number_children  Int?
+  package_photo    String?    @db.VarChar(255)
+  id_status        String?    @db.Uuid
+  last_modified_by String?    @db.Uuid
+  created_at       DateTime?  @default(now()) @db.Timestamp(6)
+  last_modified_at DateTime?  @default(now()) @db.Timestamp(6)
+  discounts        discounts? @relation(fields: [id_discount], references: [id_discount], onDelete: NoAction, onUpdate: NoAction)
+  levels           levels?    @relation(fields: [id_level], references: [id_level], onUpdate: NoAction)
+  status           status?    @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payment_methods {
+  id_payment_method String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description       String  @db.VarChar(255)
+  sales             sales[]
+}
+
+model platform_codes {
+  id_code_platform String  @id @db.VarChar(255)
+  id_user          String? @db.Uuid
+  code             String? @db.VarChar(255)
+  users            users?  @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model policies {
+  id_policy          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_country         String?              @db.Uuid
+  id_type_policy     String?              @db.Uuid
+  name_policy        String?              @db.VarChar(75)
+  description_policy String?
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  countries          countries?           @relation(fields: [id_country], references: [id_country], onDelete: NoAction, onUpdate: NoAction)
+  type_policies      type_policies?       @relation(fields: [id_type_policy], references: [id_type_policy], onDelete: NoAction, onUpdate: NoAction)
+  policy_acceptances policy_acceptances[]
+}
+
+model question_answers {
+  id_answer      String          @id @db.Uuid
+  id_question    String?         @db.Uuid
+  answer         String          @db.VarChar(255)
+  is_correct     Boolean
+  quiz_questions quiz_questions? @relation(fields: [id_question], references: [id_question], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model trainings {
+  id_training             String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_role                 String                    @db.Uuid
+  date                    DateTime?                 @db.Date
+  hour                    DateTime                  @db.Time(6)
+  link                    String                    @db.VarChar(255)
+  duration                String?                   @db.VarChar(50)
+  description             String?
+  id_type_training        String?                   @db.Uuid
+  last_modified_by        String?                   @db.Uuid
+  created_at              DateTime?                 @default(now()) @db.Timestamp(6)
+  last_modified_at        DateTime?                 @default(now()) @db.Timestamp(6)
+  training_progress       training_progress[]
+  roles                   roles                     @relation(fields: [id_role], references: [id_role], onDelete: NoAction, onUpdate: NoAction)
+  type_trainings          type_trainings?           @relation(fields: [id_type_training], references: [id_type_training], onDelete: NoAction, onUpdate: NoAction)
+  video_training_progress video_training_progress[]
+}
+
+model type_accounts {
+  id_type_account String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String          @db.VarChar(100)
+  bank_accounts   bank_accounts[]
+}
+
+model type_policies {
+  id_type_policy String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String     @db.VarChar(100)
+  policies       policies[]
+}
+
+model type_trainings {
+  id_type_training String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String      @db.VarChar(50)
+  trainings        trainings[]
+}
+
+model days {
+  id_day   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String   @db.VarChar(50)
+  code_day String?  @db.VarChar(50)
+  levels   levels[]
+}
+
+model dreams {
+  id_dream    String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dream_name  String
+  dream_price Float
+  games       games[]
+}
+
+model games {
+  id_game   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_player String   @db.Uuid
+  stage     Int
+  tutorial  Boolean?
+  id_dream  String?  @db.Uuid
+  dreams    dreams?  @relation(fields: [id_dream], references: [id_dream], onDelete: NoAction, onUpdate: NoAction)
+  users     users    @relation(fields: [id_player], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model levels {
+  id_level          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_stage          String?    @db.Uuid
+  id_day            String?    @db.Uuid
+  level_name        String
+  number            String     @db.VarChar(50)
+  description_level String
+  code_level        String?    @db.VarChar(50)
+  days              days?      @relation(fields: [id_day], references: [id_day], onDelete: Cascade, onUpdate: NoAction)
+  stages            stages?    @relation(fields: [id_stage], references: [id_stage], onDelete: Cascade, onUpdate: NoAction)
+  packages          packages[]
+}
+
+model policy_acceptances {
+  id_policy_acceptance String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_user              String?   @db.Uuid
+  id_policy            String?   @db.Uuid
+  acceptance_date      DateTime? @default(now()) @db.Timestamp(6)
+  version_policy       String?   @db.VarChar(10)
+  accepted             Boolean   @default(true)
+  policies             policies? @relation(fields: [id_policy], references: [id_policy], onDelete: NoAction, onUpdate: NoAction)
+  users                users?    @relation(fields: [id_user], references: [id_user], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model stages {
+  id_stage     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  stage_name   String
+  stage_number Int
+  levels       levels[]
+}
+
+model discounts {
+  id_discount      String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id_status        String?    @db.Uuid
+  name             String?    @db.VarChar(50)
+  number_discount  Int?
+  description      String
+  start_date       DateTime?  @db.Date
+  finish_date      DateTime?  @db.Date
+  last_modified_by String?    @db.Uuid
+  created_at       DateTime?  @default(now()) @db.Timestamp(6)
+  last_modified_at DateTime?  @default(now()) @db.Timestamp(6)
+  status           status?    @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction)
+  packages         packages[]
+}
