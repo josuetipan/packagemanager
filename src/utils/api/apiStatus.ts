@@ -1,7 +1,7 @@
+import { PackageResponse } from 'src/core/application/dtos/packages-management.dto';
 import { ErrorDto } from 'src/core/application/dtos/error.dto';
 import { apiBaseEntityName } from './apiEntites';
 import { apiMethodsName } from './apiMethodsName';
-import { ResponseDto } from 'src/core/application/dtos/response.dto';
 
 export const sendEntity = [
   {
@@ -28,7 +28,7 @@ export const apiStatus = {
   ok: {
     status: 200,
     description: 'Successful retrieval of identification types',
-    type: ResponseDto,
+    type: PackageResponse,
     content: {
       'application/json': {
         example: sendEntity,
