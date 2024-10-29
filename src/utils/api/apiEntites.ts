@@ -1,1 +1,1 @@
-export const apiBaseEntityPackage: string = 'package';
+export const apiBaseEntityName : string = 'package';

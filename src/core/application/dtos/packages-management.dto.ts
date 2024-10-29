@@ -33,11 +33,11 @@ export class PackageResponse {
       },
     },
   })
-  level?: Array<{
+  level?: {
     levelId?: string;
     levelName?: string;
     levelDescription?: string;
-  }>;
+  };
 
   @ApiProperty({ description: 'Package Contents' })
   content?: string;

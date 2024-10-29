@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
-import { PackagesModule } from './core/infrastructure/adaptarts/modules/identificationType.module';
+import { PackagesModule } from './core/infrastructure/adaptarts/modules/packagesManagement.module';
 import { PathMethodMiddleware } from './core/application/middleware/checkroutes.middleware';
 //import { ConfigModule } from '@nestjs/config';
 //import { ConfigModule } from '@nestjs/config';
