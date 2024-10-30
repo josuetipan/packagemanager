@@ -40,7 +40,7 @@ export const getIp = () => {
 };
 const kafkaConfigFormat = {
   appUser: 'JOSUE',
-  apiName: 'IdentificacionTypes',
+  apiName: 'PackagesManagement',
   country: 'Ecuador',
   city: 'Quito',
   ip: getIp(),

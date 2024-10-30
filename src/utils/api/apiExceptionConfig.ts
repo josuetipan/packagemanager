@@ -112,11 +112,11 @@ export const apiExceptionConfig = {
   validation: {
     routes: {
       put: {
-        path: '/msa/identificationtypes/1.0',
+        path: '/retrievepackages/1.0/:id',
         requiredParams: ['id'],
       },
       delete: {
-        path: '/msa/identificationtypes/1.0',
+        path: '/retrievepackages/1.0/:id',
         requiredParams: ['id'],
       },
       // Agrega más métodos y rutas para validaciones aquí

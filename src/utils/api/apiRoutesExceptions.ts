@@ -4,7 +4,7 @@ export const routesExceptions = {
   notFound: [
     {
       method: 'GET',
-      path: '/msa/retrieveidentificationtypes/1.0',
+      path: '/retrievepackages/1.0/:id',
       entity: apiBaseEntityName,
     },
     {

@@ -27,7 +27,7 @@ export const createEntity = {
 export const apiStatus = {
   ok: {
     status: 200,
-    description: 'Successful retrieval of identification types',
+    description: 'Successful retrieval of packageManagement',
     type: PackageResponse,
     content: {
       'application/json': {

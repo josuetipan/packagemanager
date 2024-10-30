@@ -37,10 +37,11 @@ export class PackageManagementService {
         );
       }
 
+
       const packageByActiveLicense = packagesPrimary.filter(
         (packageData) =>
           packageData.status.id_status === cleanedId &&
-          packageData.expiration_date >= new Date(),
+          packageData.expiration_date >= new Date() ||   packageData.discounts.finish_date >= new Date(),
       );
 
       const packageResponses: PackageResponse[] = packageByActiveLicense.map(
@@ -75,7 +76,7 @@ export class PackageManagementService {
           
         },
       );
-
+      this.logger.log(JSON.stringify(PackageResponse))
       return packageResponses;
     } catch (err) {
       throw new NotFoundException(
