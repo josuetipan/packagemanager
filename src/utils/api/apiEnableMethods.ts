@@ -1,11 +1,7 @@
 export const enablePathMethods = {
-  get: [ // Ruta con parámetro dinámico :id
-    '/retrievepackages/1.0/:id', // Ruta con parámetro dinámico :id
-    '/retrievepackages/1.0',
-    '/images/:filePath'
+  get: [ 
+    '/v1.0/retrievepackages/:id_status', 
 
   ],
-  post:[
-  '/images/upload'
-  ]
+  
 };

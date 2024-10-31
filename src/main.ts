@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { LoggerService } from './core/application/loggger/logger.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { appConfig } from './utils/config/app.config';
 import { BadRequestExceptionFilter } from './core/application/exceptions/badRequest.exception';
 import { MethodNotAllowedFilter } from './core/application/exceptions/methodNotAllow-exception';
@@ -24,12 +24,14 @@ async function bootstrap() {
   });
   const loggerService = new LoggerService();
   // Validaciones
+
   app.useGlobalPipes(new ValidationPipe());
   //Configurar el swaggwer
   const config = new DocumentBuilder()
     .setTitle('User Microservicie')
     .setDescription(`Microservicio de usuario para el modo ${appConfig.mode}`)
     .setVersion('1.0')
+    .addServer('http://localhost:3000/v1.0')
     .build();
   app.useGlobalFilters(
     new BadRequestExceptionFilter(loggerService),
@@ -44,6 +46,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   //Levantar Microservicio
+  app.setGlobalPrefix('v1.0')
   await app.listen(appConfig.port, '0.0.0.0');
   logger.log(
     `🚀 Microservice started on port ${appConfig.port} in ${appConfig.mode.toUpperCase()} mode`,

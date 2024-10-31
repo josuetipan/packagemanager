@@ -1,1 +1,1 @@
-export const apiBaseEntityName : string = 'package';
+export const apiBaseEntityName : string = 'packageManager';

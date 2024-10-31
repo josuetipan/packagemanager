@@ -65,18 +65,19 @@ export class PackageManagementService {
           return {
             name: pkg.name,
             originalPrice: pkg.price.toNumber(),
-            status : pkg.status,
             discounts,
             level,
+            status : pkg.status,
             content: pkg.content,
             description: pkg.description,
             features: pkg.characteristics,
             imageUrl: pkg.package_photo,
+            expirationDate: pkg.expiration_date
           };
           
         },
       );
-      this.logger.log(JSON.stringify(PackageResponse))
+      this.logger.log(JSON.stringify(packageResponses))
       return packageResponses;
     } catch (err) {
       throw new NotFoundException(
