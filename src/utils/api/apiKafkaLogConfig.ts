@@ -44,7 +44,7 @@ const kafkaConfigFormat = {
   country: 'Ecuador',
   city: 'Quito',
   ip: getIp(),
-  parentId: '',
+  parentId: '', 
   referenceId: '',
   method: {
     get: 'GET',
@@ -59,19 +59,19 @@ export const messageCustom = (
   level?: string,
 ): CustomLog => {
   const currentTimestamp = new Date().toISOString();
-  const microserviceName = setMethodsName(method, entity) ?? apiBaseEntityName;
+  const microserviceName = apiBaseEntityName ?? setMethodsName(method, entity)
   const startTime = Date.now(); // Tiempo de inicio en milisegundos
   const dataMessage: CustomLog = {
     timestamp: currentTimestamp,
     level: `[${level.toUpperCase()}]`,
-    message: message,
+    message: message, 
     componentType: 'Backend',
     ip: kafkaConfigFormat.ip, // Obtener la IP de la máquina local o una IP predeterminada
     appUser: kafkaConfigFormat.appUser,
     channel: 'web',
     consumer: 'self service portal',
     apiName: kafkaConfigFormat.apiName,
-    microserviceName: microserviceName,
+    microserviceName: kafkaConfigFormat.apiName,
     methodName: method || kafkaConfigFormat.method.get,
     layer: 'Exposicion',
     dateTimeTransacctionStart: currentTimestamp,

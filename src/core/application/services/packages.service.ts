@@ -19,7 +19,7 @@ export class PackageManagementService {
     //private logger: LoggerService,
   ) {}
 
-  async findAllPackagesByStatus(statusId: string): Promise<PackageResponse[]> {
+  async findAllPackagesByStatus(statusId: string, meth): Promise<PackageResponse[]> {
     const cleanedId = statusId.trim();
     try {
       const packagesPrimary = await this.prisma.packages.findMany({
@@ -77,7 +77,7 @@ export class PackageManagementService {
           
         },
       );
-      this.logger.log(JSON.stringify(packageResponses))
+      this.logger.log(JSON.stringify(packageResponses), meth.url, apiBaseEntityName)
       return packageResponses;
     } catch (err) {
       throw new NotFoundException(
