@@ -42,7 +42,8 @@ export class PacakageManagementController {
   @ApiResponse(apiStatus.serviceUnavailable)
   @ApiResponse(apiStatus.conflict)
   @ApiResponse(apiStatus.notFound)
-  //@UseGuards(AuthGuard)
+  
+  @UseGuards(AuthGuard)
   @Get('retrievepackages/:id_status')
   async getAllPack(
     @Param('id_status') id: string, @Req() req: Request

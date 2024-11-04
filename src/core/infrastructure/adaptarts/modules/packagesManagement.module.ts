@@ -6,18 +6,15 @@ import {  PackageManagementService } from 'src/core/application/services/package
 import { AuthGuardModule } from 'auth-guard-michimoney';
 import { HttpModule } from '@nestjs/axios';
 import { AuthConfig } from 'auth-guard-michimoney/dist/auth-config.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     LoggerModule.register(process.env.USE_KAFKA === 'true'),
     HttpModule,
-    AuthGuardModule.register({
-      introspectionUrl: 'http://192.168.100.221:31745/auth/realms/MICHIMONEYWEB_DEV/protocol/openid-connect/token/introspect',
-      clientId: 'michimoney_app',
-      clientSecret: '387f125b-da1d-4c4a-8964-d44ef8debe7c',
-    } as AuthConfig), // Proporciona la configuración aquí
+    AuthGuardModule.registerAsync(), // Proporciona la configuración aquí
   ],
   controllers:[PacakageManagementController],
-  providers: [PackageManagementService, PrismaService],
+  providers: [PackageManagementService, PrismaService, ConfigService],
 })
 export class PackagesModule {}

@@ -10,7 +10,7 @@ export class LoggerKafkaService extends LoggerService {
   constructor() {
     super();
     const brokers = process.env.KAFKA_BROKERS?.split(',') || [
-      '192.168.68.121:9092',
+      '192.168.68.115:9092',
     ];
     const topic = process.env.KAFKA_TOPIC || 'logs-michimoney';
     this.kafkaLogger = new KafkaLogger(brokers, topic);
