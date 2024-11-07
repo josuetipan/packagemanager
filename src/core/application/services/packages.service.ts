@@ -15,8 +15,8 @@ import { PackageResponse } from '../dtos/packages-management.dto';
 export class PackageManagementService {
   constructor(
     private prisma: PrismaService,
-    private logger:LoggerKafkaService ,
-    //private logger: LoggerService,
+    //private logger:LoggerKafkaService ,
+    private logger: LoggerService,
   ) {}
 
   async findAllPackagesByStatus(statusId: string, meth): Promise<PackageResponse[]> {
@@ -24,7 +24,7 @@ export class PackageManagementService {
     try {
       const packagesPrimary = await this.prisma.packages.findMany({
         where: { id_status: cleanedId },
-        include: {
+        include: {  
           discounts: true,
           levels: true,
           status: true,
@@ -77,7 +77,7 @@ export class PackageManagementService {
           
         },
       );
-      this.logger.log(JSON.stringify(packageResponses), meth.url, apiBaseEntityName)
+      this.logger.log(JSON.stringify(packageResponses))
       return packageResponses;
     } catch (err) {
       throw new NotFoundException(

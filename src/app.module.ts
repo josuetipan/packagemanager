@@ -1,8 +1,8 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { PackagesModule } from './core/infrastructure/adaptarts/modules/PackagesManagement.module';
 import { PathMethodMiddleware } from './core/application/middleware/checkroutes.middleware';
-//import { ConfigModule } from '@nestjs/config';
-//import { ConfigModule } from '@nestjs/config';
+import { MinioController } from './core/infrastructure/adaptarts/controllers/v1/mino.contoller';
+import { MinioService } from './core/application/services/minio.service';
 
 @Module({
   imports: [
@@ -12,8 +12,8 @@ import { PathMethodMiddleware } from './core/application/middleware/checkroutes.
     //isGlobal: true, // Hace que el ConfigModule esté disponible en toda la app sin necesidad de importarlo en cada módulo
     //}),
   ],
-  controllers: [],
-  providers: [],
+  controllers: [MinioController],
+  providers: [MinioService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

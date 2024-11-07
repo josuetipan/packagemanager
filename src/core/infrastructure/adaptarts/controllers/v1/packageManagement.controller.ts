@@ -27,6 +27,8 @@ import { Validator } from 'src/utils/api/apiValidations';
 @Controller(
   {version: 'v1.0',}
 )
+@UseGuards(CheckDatabaseConnectionGuard)
+
 export class PacakageManagementController {
   constructor(private PackageManagerController: PackageManagementService,
     private logger: LoggerKafkaService

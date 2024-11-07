@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { PrismaClientInitializationError } from '@prisma/client/runtime/library';
 import { LoggerKafkaService } from '../loggger/loggerKafka.service';
 import { LoggerService } from '../loggger/logger.service';
 
 @Injectable()
-export class PrismaService extends PrismaClient {
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger =
     process.env.USE_KAFKA == 'true'
       ? new LoggerKafkaService()
@@ -15,6 +15,10 @@ export class PrismaService extends PrismaClient {
 
   async onModuleInit() {
     await this.connectToDatabase();
+  }
+
+  async onModuleDestroy(){
+    await this.$disconnect();
   }
 
   private async connectToDatabase() {
