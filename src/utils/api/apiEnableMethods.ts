@@ -4,7 +4,7 @@ export const enablePathMethods = {
     '/v1.0/:filePath'
   ],
   post:[
-    '/v1.0/images/upload'
+    '/v1.0/upload'
   ]
   
 };

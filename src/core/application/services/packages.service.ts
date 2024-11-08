@@ -19,15 +19,18 @@ export class PackageManagementService {
     private prisma: PrismaService,
     //private logger:LoggerKafkaService ,
     private logger: LoggerService,
-    private controller : MinioService
+    private controller: MinioService,
   ) {}
 
-  async findAllPackagesByStatus(statusId: string, meth): Promise<PackageResponse[]> {
+  async findAllPackagesByStatus(
+    statusId: string,
+    meth,
+  ): Promise<PackageResponse[]> {
     const cleanedId = statusId.trim();
     try {
       const packagesPrimary = await this.prisma.packages.findMany({
         where: { id_status: cleanedId },
-        include: {  
+        include: {
           discounts: true,
           levels: true,
           status: true,
@@ -42,66 +45,68 @@ export class PackageManagementService {
 
       const packageByActiveLicense = packagesPrimary.filter(
         (packageData) =>
-          packageData.status.id_status === cleanedId &&
-          packageData.expiration_date >= new Date() ||   packageData.discounts.finish_date >= new Date(),
+          (packageData.status.id_status === cleanedId &&
+            packageData.expiration_date >= new Date()) ||
+          packageData.discounts.finish_date >= new Date(),
       );
-      const imgUrl = await this.images()
+      const imgUrl = await this.images();
       const packageResponses: PackageResponse[] = packageByActiveLicense.map(
-        (pkg) => {
-          const discounts=pkg.discounts
-          ? [
-              {
-                discountId: pkg.discounts.id_discount,
-                discountName: pkg.discounts.name,
-                discountValue: pkg.discounts.number_discount,
-              },
-            ]
-          : []
-          const level = pkg.levels 
-          ? {
-              levelId: pkg.levels.id_level,
-              levelName: pkg.levels.level_name,
-              levelDescription: pkg.levels.description_level,
-            }
-          : null
+        (pkg, index) => {
+          const discounts = pkg.discounts
+            ? [
+                {
+                  discountId: pkg.discounts.id_discount,
+                  discountName: pkg.discounts.name,
+                  discountValue: pkg.discounts.number_discount,
+                },
+              ]
+            : [];
+          const level = pkg.levels
+            ? {
+                levelId: pkg.levels.id_level,
+                levelName: pkg.levels.level_name,
+                levelDescription: pkg.levels.description_level,
+              }
+            : null;
           return {
             name: pkg.name,
             originalPrice: pkg.price.toNumber(),
             discounts,
             level,
-            status : pkg.status,
+            status: pkg.status,
             content: pkg.content,
             description: pkg.description,
+            imageUrl: imgUrl[index],
             features: pkg.characteristics,
-            imageUrl: imgUrl,
-            expirationDate: pkg.expiration_date
+            expirationDate: pkg.expiration_date,
           };
-          
         },
       );
-      this.logger.log(JSON.stringify(packageResponses))
-      console.log("------------"+imgUrl)
+      this.logger.log(JSON.stringify(packageResponses));
+      console.log('------------' + imgUrl);
       return packageResponses;
     } catch (err) {
       throw err;
     }
   }
 
-  async images(){
-    
-    const images = await this.prisma.packages.findMany({
-    });
+  async images() {
+    const images = await this.prisma.packages.findMany({});
 
-    const imagesResponse: PackageResponse[] = images.map(
-      (pkg) => {
-        return {
-          imageUrl: pkg.package_photo,
-        };
-      },
-    );
-    const back = "michimoney-media-videos-dev"
-    const imagesLinks = await this.controller.getFile(back,imagesResponse[0].imageUrl)
+    const imagesResponse: PackageResponse[] = images.map((pkg) => {
+      return {
+        imageUrl: pkg.package_photo,
+      };
+    });
+    const back = 'michimoney-media-images-dev';
+    const imagesLinks: string[] = [];
+
+    for (let i = 0; i < imagesResponse.length; i++) {
+      const im = imagesResponse[i].imageUrl;
+      const links = await this.controller.getFile(back, im);
+      imagesLinks.push(links);
+    }
+
     return imagesLinks;
   }
-
 }
