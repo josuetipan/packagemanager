@@ -82,7 +82,6 @@ export class PackageManagementService {
           };
         },
       );
-      this.logger.log(JSON.stringify(packageResponses));
       console.log('------------' + imgUrl);
       return packageResponses;
     } catch (err) {

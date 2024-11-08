@@ -13,6 +13,7 @@ import { InternalServerErrorExceptionFilter } from './core/application/exception
 import { ServiceUnavailableExceptionFilter } from './core/application/exceptions/serviceUnavailable.exception';
 import { UnauthorizedExceptionFilter } from './core/application/exceptions/unauthorized.exception';
 import { LoggerKafkaService } from './core/application/loggger/loggerKafka.service';
+import { LoggingInterceptor } from './core/application/interceptor/request.interceptor';
 async function bootstrap() {
   //Establecer logger e inicializar NEST
   const logger =
@@ -24,7 +25,8 @@ async function bootstrap() {
   });
   const loggerService = new LoggerService();
   // Validaciones
-
+  const allowCorsOrigin = process.env.CORS_ORIGINS?.split(',') ?? '*';
+  app.enableCors({ origin: allowCorsOrigin });
   app.useGlobalPipes(new ValidationPipe());
   //Configurar el swaggwer
   const config = new DocumentBuilder()
@@ -43,10 +45,11 @@ async function bootstrap() {
     new UnauthorizedExceptionFilter(loggerService),
     new MethodNotAllowedFilter(loggerService),
   );
+  app.useGlobalInterceptors(new LoggingInterceptor(loggerService));
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   //Levantar Microservicio
-  app.setGlobalPrefix('v1.0')
+  app.setGlobalPrefix('v1.0');
   await app.listen(appConfig.port);
   logger.log(
     `🚀 Microservice started on port ${appConfig.port} in ${appConfig.mode.toUpperCase()} mode`,

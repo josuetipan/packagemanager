@@ -1,8 +1,7 @@
 // logger.service.ts
 import { Injectable } from '@nestjs/common';
 import { Logger, createLogger, format, transports } from 'winston';
-import  'winston-daily-rotate-file';
-import { Kafka } from 'kafkajs';
+import 'winston-daily-rotate-file';
 
 @Injectable()
 export class LoggerService {
@@ -10,18 +9,23 @@ export class LoggerService {
   private loggerError: Logger;
   private loggerDebug: Logger;
   private loggerAll: Logger;
-  private kafkaProducer;
-  
 
   constructor() {
     // Inicializamos el KafkaLogger con el broker y el tópico deseado
-    this.kafkaProducer;
     this.createLoggers(); // Creamos los loggers de Winston
   }
 
-  
-
   createLoggers() {
+    const syslogColors = {
+      debug: 'rainbow',
+      info: 'green',
+      notice: 'white',
+      warning: 'yellow',
+      error: 'red',
+      crit: 'inverse yellow',
+      alert: 'bold inverse red',
+      emerg: 'bold inverse magenta',
+    };
     const textFormat = format.combine(
       format.printf((log) => {
         return `${log.timestamp} - [${log.level.toUpperCase()}] ${log.message}`;
@@ -31,8 +35,8 @@ export class LoggerService {
       format: 'YYYY-MM-DD HH:mm:ss',
     });
 
-     // Logger para mensajes de info
-     this.loggerInfo = createLogger({
+    // Logger para mensajes de info
+    this.loggerInfo = createLogger({
       level: 'info',
       format: format.combine(dateFormat, textFormat),
       transports: [
@@ -83,42 +87,47 @@ export class LoggerService {
           maxSize: '20m',
           maxFiles: '14d',
         }),
-        new transports.Console(), // También imprimimos en consola
+        new transports.Console({
+          format: format.combine(
+            textFormat,
+            format.colorize({
+              all: true,
+              colors: syslogColors,
+            }),
+          ),
+        }), // También imprimimos en consola
       ],
     });
   }
-  async log(message: string) {
-    const levelLogger = process.env.LOG_LEVEL ?? "debug"
-    if (levelLogger === "info") {
+  async log(message: string | object) {
+    const levelLogger = process.env.LOG_LEVEL ?? 'debug';
+    if (levelLogger === 'info') {
       this.loggerInfo.info(message);
     }
-    if (levelLogger === "debug" || levelLogger === "info") {
+    if (levelLogger === 'debug' || levelLogger === 'info') {
       this.loggerAll.info(message);
     }
   }
 
-  async error(message: string) {
-    const levelLogger = process.env.LOG_LEVEL ?? "debug" //error
-    if(levelLogger === "error") {
+  async error(message: string | object) {
+    const levelLogger = process.env.LOG_LEVEL ?? 'debug'; //error
+    if (levelLogger === 'error') {
       this.loggerError.error(message);
     }
     this.loggerAll.error(message);
   }
-  
 
-  
-  async debug(message: string) {
-    const levelLogger = process.env.LOG_LEVEL ?? "debug"
-    
-    if(levelLogger === "debug") {
+  async debug(message: string | object) {
+    const levelLogger = process.env.LOG_LEVEL ?? 'debug';
+    if (levelLogger === 'debug') {
       this.loggerDebug.debug(message);
     }
-    this.loggerAll.debug(message)
+    this.loggerAll.debug(message);
   }
-  async warn(message: string) {
+  async warn(message: string | object) {
     this.loggerAll.warn(message);
   }
-  async verbose(message: string) {
+  async verbose(message: string | object) {
     this.loggerAll.verbose(message);
   }
 }
