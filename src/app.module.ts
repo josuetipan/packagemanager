@@ -14,6 +14,7 @@ import { MinioService } from './core/application/services/minio.service';
   ],
   controllers: [MinioController],
   providers: [MinioService],
+  exports: [MinioService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

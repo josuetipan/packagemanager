@@ -10,6 +10,8 @@ import { LoggerService } from '../loggger/logger.service';
 import { LoggerKafkaService } from '../loggger/loggerKafka.service';
 import { apiBaseEntityName } from 'src/utils/api/apiEntites';
 import { PackageResponse } from '../dtos/packages-management.dto';
+import { MinioController } from 'src/core/infrastructure/adaptarts/controllers/v1/mino.contoller';
+import { MinioService } from './minio.service';
 
 @Injectable()
 export class PackageManagementService {
@@ -17,6 +19,7 @@ export class PackageManagementService {
     private prisma: PrismaService,
     //private logger:LoggerKafkaService ,
     private logger: LoggerService,
+    private controller : MinioService
   ) {}
 
   async findAllPackagesByStatus(statusId: string, meth): Promise<PackageResponse[]> {
@@ -31,19 +34,18 @@ export class PackageManagementService {
         },
       });
 
-      if (!packagesPrimary || packagesPrimary.length === 0) {
+      if (!packagesPrimary) {
         throw new NotFoundException(
           `No se encontraron paquetes para el ID de estado: ${statusId}`,
         );
       }
-
 
       const packageByActiveLicense = packagesPrimary.filter(
         (packageData) =>
           packageData.status.id_status === cleanedId &&
           packageData.expiration_date >= new Date() ||   packageData.discounts.finish_date >= new Date(),
       );
-
+      const imgUrl = await this.images()
       const packageResponses: PackageResponse[] = packageByActiveLicense.map(
         (pkg) => {
           const discounts=pkg.discounts
@@ -71,18 +73,35 @@ export class PackageManagementService {
             content: pkg.content,
             description: pkg.description,
             features: pkg.characteristics,
-            imageUrl: pkg.package_photo,
+            imageUrl: imgUrl,
             expirationDate: pkg.expiration_date
           };
           
         },
       );
       this.logger.log(JSON.stringify(packageResponses))
+      console.log("------------"+imgUrl)
       return packageResponses;
     } catch (err) {
-      throw new NotFoundException(
-        `Error al obtener paquetes para el ID de estado: ${statusId}`,
-      );
+      throw err;
     }
   }
+
+  async images(){
+    
+    const images = await this.prisma.packages.findMany({
+    });
+
+    const imagesResponse: PackageResponse[] = images.map(
+      (pkg) => {
+        return {
+          imageUrl: pkg.package_photo,
+        };
+      },
+    );
+    const back = "michimoney-media-videos-dev"
+    const imagesLinks = await this.controller.getFile(back,imagesResponse[0].imageUrl)
+    return imagesLinks;
+  }
+
 }

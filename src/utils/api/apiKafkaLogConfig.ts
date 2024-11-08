@@ -39,7 +39,7 @@ export const getIp = () => {
   return '0.0.0.0'; // Retorna un valor por defecto
 };
 const kafkaConfigFormat = {
-  appUser: 'JOSUE',
+  appUser: '',
   apiName: 'PackagesManagement',
   country: 'Ecuador',
   city: 'Quito',

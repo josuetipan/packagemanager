@@ -19,11 +19,13 @@ export class LoggerKafkaService extends LoggerService {
 
   async log(message: string, method?: string, entity?: string) {
     const mensaje = messageCustom(message, method, entity, 'INFO');
+    super.log(message)
     await this.kafkaLogger.logCustomMessage('INFO', mensaje);
   }
 
   async error(message: string, method?: string, entity?: string) {
     const mensaje = messageCustom(message, method, entity, 'ERROR');
+    super.error(message)
     await this.kafkaLogger.logCustomMessage('ERROR', mensaje);
   }
 

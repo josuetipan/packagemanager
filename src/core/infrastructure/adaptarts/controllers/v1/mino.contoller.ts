@@ -10,7 +10,7 @@ import {
   import { FileInterceptor } from '@nestjs/platform-express';
 import { MinioService } from 'src/core/application/services/minio.service';
   
-  @Controller('images')
+  @Controller()
   export class MinioController {
     constructor(private readonly minioService: MinioService) {}
   
@@ -20,7 +20,7 @@ import { MinioService } from 'src/core/application/services/minio.service';
       if (!file) {
         throw new BadRequestException('No file provided');
       }
-      const bucketName = 'package'; // Asegúrate de que el bucket existe
+      const bucketName = "package"; // Asegúrate de que el bucket existe
       const contentType = file.mimetype || 'image/png';
       const filePath = await this.minioService.uploadFile(
         bucketName,
@@ -33,10 +33,15 @@ import { MinioService } from 'src/core/application/services/minio.service';
 
     @Get(':filePath')
     async getFile(@Param('filePath') filePath: string) {
-      const bucketName = 'package'; // Asegúrate de que el bucket existe
+      console.log(filePath);
+      
+      const bucketName = 'michimoney-media-videos-dev'; // Asegúrate de que el bucket existe
       const url = await this.minioService.getFile(bucketName, filePath);
-      console.log(url)
+      console.log('es link de controller'+url)
       return { url }; // Devuelve la URL para acceder al archivo
     }
+    
+    
+
   }
   
