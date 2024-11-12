@@ -7,7 +7,8 @@ export class PackageResponse {
   @ApiProperty({ description: 'Original price of the package' })
   originalPrice?: number;
 
-  @ApiProperty({ type: 'array',
+  @ApiProperty({
+    type: 'array',
     items: {
       type: 'object',
       properties: {
@@ -15,7 +16,8 @@ export class PackageResponse {
         discountName: { type: 'string', description: 'Name of  discount' },
         discountValue: { type: 'number', description: 'Value of discount' },
       },
-    }, })
+    },
+  })
   discounts?: Array<{
     discountId: string;
     discountName: string;
@@ -29,7 +31,10 @@ export class PackageResponse {
       properties: {
         levelId: { type: 'string', description: 'ID of the level' },
         levelName: { type: 'string', description: 'Name of the level' },
-        levelDescription: { type: 'string', description: 'Description of the level' },
+        levelDescription: {
+          type: 'string',
+          description: 'Description of the level',
+        },
       },
     },
   })
@@ -46,12 +51,14 @@ export class PackageResponse {
   description?: string;
 
   @ApiProperty({ description: 'Features of packages' })
-  features?: string; 
+  features?: string;
 
   @ApiProperty({ description: 'Package image url' })
   imageUrl?: string;
 }
 
-
-
-
+export class okResponse {
+  code: string;
+  messagges: string;
+  data: PackageResponse[];
+}

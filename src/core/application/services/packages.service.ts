@@ -9,9 +9,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { LoggerService } from '../loggger/logger.service';
 import { LoggerKafkaService } from '../loggger/loggerKafka.service';
 import { apiBaseEntityName } from 'src/utils/api/apiEntites';
-import { PackageResponse } from '../dtos/packages-management.dto';
+import { okResponse, PackageResponse } from '../dtos/packages-management.dto';
 import { MinioController } from 'src/core/infrastructure/adaptarts/controllers/v1/mino.contoller';
 import { MinioService } from './minio.service';
+import { env } from 'process';
 
 @Injectable()
 export class PackageManagementService {
@@ -22,14 +23,9 @@ export class PackageManagementService {
     private controller: MinioService,
   ) {}
 
-  async findAllPackagesByStatus(
-    statusId: string,
-    meth,
-  ): Promise<PackageResponse[]> {
-    const cleanedId = statusId.trim();
+  async findAllPackagesByStatus(meth): Promise<okResponse> {
     try {
       const packagesPrimary = await this.prisma.packages.findMany({
-        where: { id_status: cleanedId },
         include: {
           discounts: true,
           levels: true,
@@ -37,17 +33,8 @@ export class PackageManagementService {
         },
       });
 
-      if (!packagesPrimary) {
-        throw new NotFoundException(
-          `No se encontraron paquetes para el ID de estado: ${statusId}`,
-        );
-      }
-
       const packageByActiveLicense = packagesPrimary.filter(
-        (packageData) =>
-          (packageData.status.id_status === cleanedId &&
-            packageData.expiration_date >= new Date()) ||
-          packageData.discounts.finish_date >= new Date(),
+        (packageData) => packageData.expiration_date >= new Date(),
       );
       const imgUrl = await this.images();
       const packageResponses: PackageResponse[] = packageByActiveLicense.map(
@@ -83,7 +70,13 @@ export class PackageManagementService {
         },
       );
       console.log('------------' + imgUrl);
-      return packageResponses;
+      const response: okResponse = {
+        code: '200',
+        messagges: 'OK',
+        data: packageResponses,
+      };
+
+      return response;
     } catch (err) {
       throw err;
     }
@@ -97,7 +90,7 @@ export class PackageManagementService {
         imageUrl: pkg.package_photo,
       };
     });
-    const back = 'michimoney-media-images-dev';
+    const back = process.env.MINIO_BUCKET_IMAGEN;
     const imagesLinks: string[] = [];
 
     for (let i = 0; i < imagesResponse.length; i++) {
@@ -105,6 +98,7 @@ export class PackageManagementService {
       const links = await this.controller.getFile(back, im);
       imagesLinks.push(links);
     }
+    console.log(imagesLinks);
 
     return imagesLinks;
   }
