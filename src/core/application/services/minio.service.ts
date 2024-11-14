@@ -11,12 +11,12 @@ export class MinioService {
     this.minioClient = new MinioClient({
       endPoint: process.env.MINIO_ENDPOINT,
       port: parseInt(process.env.MINIO_PORT),
-      useSSL: false,
+      useSSL: true,
       accessKey: process.env.MINIO_ACCESS_KEY,
       secretKey: process.env.MINIO_SECRET_KEY,
-      // transportAgent: new https.Agent({
-      //   rejectUnauthorized: false,
-      // }),
+      transportAgent: new https.Agent({
+        rejectUnauthorized: false,
+      }),
     });
   }
 
@@ -50,6 +50,7 @@ export class MinioService {
         'GET',
         bucketName,
         filePath,
+        24 * 60 * 60,
       ); // URL válida por 24 horas
       console.log('este es el link de servicio: ' + url);
       return url; // Devuelve la URL para acceder al archivo
