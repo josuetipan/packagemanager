@@ -23,7 +23,7 @@ export class PackageManagementService {
     private controller: MinioService,
   ) {}
 
-  async findAllPackagesByStatus(meth): Promise<okResponse> {
+  async findAllPackagesByStatus(): Promise<okResponse> {
     try {
       const packagesPrimary = await this.prisma.packages.findMany({
         include: {
@@ -36,7 +36,7 @@ export class PackageManagementService {
       const packageByActiveLicense = packagesPrimary.filter(
         (packageData) => packageData.expiration_date >= new Date(),
       );
-      const imgUrl = await this.images();
+      const imgUrl = await this.images(packageByActiveLicense);
       const packageResponses: PackageResponse[] = packageByActiveLicense.map(
         (pkg, index) => {
           const discounts = pkg.discounts
@@ -82,14 +82,14 @@ export class PackageManagementService {
     }
   }
 
-  async images() {
-    const images = await this.prisma.packages.findMany({});
-
-    const imagesResponse: PackageResponse[] = images.map((pkg) => {
-      return {
-        imageUrl: pkg.package_photo,
-      };
-    });
+  async images(packageByActiveLicens) {
+    const imagesResponse: PackageResponse[] = packageByActiveLicens.map(
+      (pkg) => {
+        return {
+          imageUrl: pkg.package_photo,
+        };
+      },
+    );
     const back = process.env.MINIO_BUCKET_IMAGEN;
     const imagesLinks: string[] = [];
 

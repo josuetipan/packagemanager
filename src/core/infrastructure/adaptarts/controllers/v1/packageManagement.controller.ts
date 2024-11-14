@@ -49,9 +49,9 @@ export class PacakageManagementController {
   @ApiResponse(apiStatus.notFound)
   @UseGuards(AuthGuard)
   @Get('retrievepackages')
-  async getAllPack(@Req() req: Request): Promise<okResponse> {
+  async getAllPack(): Promise<okResponse> {
     const packaheControler =
-      await this.PackageManagerController.findAllPackagesByStatus(req);
+      await this.PackageManagerController.findAllPackagesByStatus();
     return packaheControler;
   }
 }
